@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Currency Converter</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .converter {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+      width: 350px;
+      backdrop-filter: blur(10px);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    input, select {
+      background: #ffffffcc;
+      color: black;
+    }
+
+    button {
+      background-color: #ffffff;
+      color: #0072ff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #eeeeee;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="converter">
+    <h2>💱 Live Currency Converter</h2>
+    <input type="number" id="amount" placeholder="Enter amount" />
+    
+    <select id="fromCurrency">
+      <option value="USD">USD 🇺🇸</option>
+      <option value="INR">INR 🇮🇳</option>
+      <option value="EUR">EUR 🇪🇺</option>
+      <option value="JPY">JPY 🇯🇵</option>
+      <option value="GBP">GBP 🇬🇧</option>
+    </select>
+    
+    <select id="toCurrency">
+      <option value="INR">INR 🇮🇳</option>
+      <option value="USD">USD 🇺🇸</option>
+      <option value="EUR">EUR 🇪🇺</option>
+      <option value="JPY">JPY 🇯🇵</option>
+      <option value="GBP">GBP 🇬🇧</option>
+    </select>
+    
+    <button onclick="convert()">Convert</button>
+    <div class="result" id="result">Conversion result will appear here 💸</div>
+  </div>
+
+  <script>
+    async function convert() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const fromCurrency = document.getElementById('fromCurrency').value;
+      const toCurrency = document.getElementById('toCurrency').value;
+      const resultDiv = document.getElementById('result');
+  
+      if (isNaN(amount) || amount <= 0) {
+        resultDiv.innerText = "⚠️ Please enter a valid amount.";
+        return;
+      }
+  
+      const url = `https://open.er-api.com/v6/latest/${fromCurrency}`;
+  
+      try {
+        resultDiv.innerText = "⏳ Converting...";
+  
+        const response = await fetch(url);
+        const data = await response.json();
+  
+        if (data.result !== "success") {
+          throw new Error("API failed");
+        }
+  
+        const rate = data.rates[toCurrency];
+        const convertedAmount = (amount * rate).toFixed(2);
+  
+        resultDiv.innerHTML = `
+          ${amount} ${fromCurrency} = 
+          <strong>${convertedAmount} ${toCurrency}</strong> 💸
+        `;
+      } catch (error) {
+        console.error(error);
+        resultDiv.innerText = "❌ Unable to fetch rates. Try again later.";
+      }
+    }
+  </script>
+  
+  
+
+</body>
+</html>
